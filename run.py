@@ -2,7 +2,6 @@
 import asyncio, json
 from pathlib import Path
 from playwright.async_api import async_playwright
-from PIL import Image
 
 async def main():
     async with async_playwright() as p:
@@ -27,12 +26,7 @@ async def main():
         await page.wait_for_timeout(2000)
 
         await page.screenshot(path="qr.png")
-        img = Image.open("qr.png")
-        qr = img.crop((575, 365, 720, 510))
-        qr = qr.resize((500, 500), Image.LANCZOS)
-        qr.save("qr.png")
-
-        print("qr.png generated, waiting for login...", flush=True)
+        print("qr.png generated", flush=True)
 
         for i in range(60):
             await page.wait_for_timeout(3000)
@@ -48,37 +42,79 @@ async def main():
         state = await context.storage_state()
         Path("session.json").write_text(json.dumps(state, ensure_ascii=False, indent=2))
 
+        print("Opening target page...", flush=True)
         await page.goto("https://v.kuaishou.com/J5fMwYm2", wait_until="domcontentloaded", timeout=30000)
-        await page.wait_for_timeout(3000)
+        await page.wait_for_timeout(5000)
+
         await page.screenshot(path="target.png")
+        print("target.png saved", flush=True)
 
-        for sel in ["button:has-text('发消息')", "button:has-text('私信')", "a:has-text('发消息')", "a:has-text('私信')"]:
-            btn = await page.query_selector(sel)
-            if btn:
-                await btn.click()
-                break
+        body = await page.inner_text("body")
+        if "security verification" in body.lower() or "Please complete" in body:
+            print("Security check found, waiting 15s...", flush=True)
+            await page.wait_for_timeout(15000)
+            await page.screenshot(path="target.png")
+
+        print("Clicking message button via JS...", flush=True)
+        await page.evaluate("""() => {
+            const all = document.querySelectorAll('button, a, [role="button"], div[class*="btn"]');
+            for (const el of all) {
+                const text = (el.innerText || '').trim();
+                if (text === '私信' || text === '发消息') {
+                    el.click();
+                    return 'clicked: ' + text;
+                }
+            }
+            for (const el of all) {
+                const text = (el.innerText || '').trim();
+                if (text.includes('消息') || text.includes('私信')) {
+                    el.click();
+                    return 'clicked partial: ' + text;
+                }
+            }
+            return 'not found';
+        }""")
+
+        await page.wait_for_timeout(3000)
+        await page.screenshot(path="chat.png")
+        print("chat.png saved", flush=True)
+
+        print("Typing message...", flush=True)
+        await page.evaluate("""() => {
+            const inputs = document.querySelectorAll('textarea, div[contenteditable="true"], input[type="text"], input[placeholder*="输入"], input[placeholder*="消息"]');
+            for (const inp of inputs) {
+                const rect = inp.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    if (inp.tagName === 'DIV') {
+                        inp.innerText = 'u';
+                        inp.dispatchEvent(new Event('input', {bubbles: true}));
+                    } else {
+                        inp.value = 'u';
+                        inp.dispatchEvent(new Event('input', {bubbles: true}));
+                    }
+                    return 'typed in: ' + inp.tagName;
+                }
+            }
+            return 'no input found';
+        }""")
+
+        await page.wait_for_timeout(500)
+
+        print("Sending...", flush=True)
+        await page.evaluate("""() => {
+            const sends = document.querySelectorAll('button');
+            for (const btn of sends) {
+                if (btn.innerText.trim() === '发送') {
+                    btn.click();
+                    return 'sent via button';
+                }
+            }
+            return 'trying enter';
+        }""")
+
+        await page.keyboard.press("Enter")
         await page.wait_for_timeout(2000)
 
-        for sel in ["textarea", "div[contenteditable='true']", "input[placeholder*='输入']", "[class*='chatInput']"]:
-            ta = await page.query_selector(sel)
-            if ta:
-                tag = await ta.evaluate("el => el.tagName")
-                await ta.click()
-                await page.wait_for_timeout(300)
-                if tag == "DIV":
-                    await ta.evaluate("el => el.innerText = 'u'")
-                    await ta.evaluate("el => el.dispatchEvent(new Event('input', {bubbles: true}))")
-                else:
-                    await ta.fill("u")
-                await page.wait_for_timeout(500)
-                send = await page.query_selector("button:has-text('发送'), button[class*='send']")
-                if send:
-                    await send.click()
-                else:
-                    await page.keyboard.press("Enter")
-                break
-
-        await page.wait_for_timeout(2000)
         await page.screenshot(path="sent.png")
         print("DONE", flush=True)
         await browser.close()
