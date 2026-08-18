@@ -1,0 +1,52 @@
+[
+  {
+    "name": "_did",
+    "value": "web_764967616E29AF2",
+    "domain": ".kuaishou.com",
+    "path": "/",
+    "expires": -1,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "kwpsecproductname",
+    "value": "account-zt-pc",
+    "domain": "passport.kuaishou.com",
+    "path": "/",
+    "expires": 1789677962,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "kwfv1",
+    "value": "PnGU+9+Y8008S+nH0U+0mjPf8fP08f+98f+nLlwnrIP9PIweQY+er7GfLUGAqM+B8D8nPhPnrFPA+f+0WMG9L7+Acl+9bY80Y0P/DU+/bf+98YwnHFPnQfPnrMG0LlG0bD+nr7+eqMG0ZhwBrA8ebYP0Dh+0GA+e8S+/SSP/W7G9c=",
+    "domain": ".kuaishou.com",
+    "path": "/",
+    "expires": 1789677962,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "kwssectoken",
+    "value": "TsGQsKix7JZ1viK7rbpnrW4wRoPUn9t6ZZaPHUeyc8hvyoeoHX2hOWapqDZMG4uw//VEBGfqdEtkI/fWcLyKgA==",
+    "domain": "passport.kuaishou.com",
+    "path": "/",
+    "expires": 1787086322,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "kwscode",
+    "value": "933f4065f7715a5bd619333317306be85211bb1c7aafb83e9a7c35189ce05e1d",
+    "domain": "passport.kuaishou.com",
+    "path": "/",
+    "expires": 1787086322,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]
