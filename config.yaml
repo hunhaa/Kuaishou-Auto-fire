@@ -1,0 +1,36 @@
+# 快手自动续火花配置文件
+# ========================================
+# 联系人列表 - 可以配置多个好友
+# 两种查找方式:
+#   1. 通过昵称搜索 (name字段)
+#   2. 通过主页URL直接访问 (profile_url字段，更精准)
+#
+# 示例:
+#   - name: "好友昵称"
+#     message: "续火花啦~"
+#   - profile_url: "https://www.kuaishou.com/profile/3xbr2v5rnp96a3m"
+#     message: "想你啦~"
+
+contacts:
+  - name: "好友昵称1"
+    message: "今天也要开心呀~"
+  - name: "好友昵称2"
+    message: "续火花啦，想你啦~"
+  # - profile_url: "https://www.kuaishou.com/profile/3xbr2v5rnp96a3m"
+  #   message: "直接通过URL访问的好友~"
+
+# 定时任务配置
+schedule:
+  enabled: true
+  cron: "0 9 * * *"  # cron表达式: 分 时 日 月 周
+  timezone: "Asia/Shanghai"
+
+# 脚本设置
+settings:
+  headless: false          # 是否无头模式(不显示浏览器)
+  browser_type: "chromium" # 浏览器类型: chromium/firefox
+  message_delay: 3         # 发送消息间隔(秒)
+  max_retry: 3             # 最大重试次数
+  retry_delay: 5           # 重试间隔(秒)
+  page_timeout: 30         # 页面加载超时(秒)
+  wait_after_send: 2       # 发送后等待时间(秒)
